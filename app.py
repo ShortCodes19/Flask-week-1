@@ -2,9 +2,10 @@ from flask import Flask, render_template, redirect, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
-app.config['SQLACHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'secret'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///post.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'somethingsecret'
+
 db = SQLAlchemy(app)
 
 class Post(db.Model):
@@ -12,13 +13,17 @@ class Post(db.Model):
     title = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
 
-# Routes
 @app.route('/')
 def home():
     return render_template('base.html')
 
-@app.route('/add_post', methods=['GET', 'POST'])
-def add_post():
+@app.route('/view_all')
+def view_all():
+    posts = Post.query.all()
+    return render_template('view_all.html', posts=posts)
+
+@app.route('/add', methods=['GET', 'POST'])
+def add():
     if request.method == 'POST':
         title = request.form.get('title')
         content = request.form.get('content')
@@ -26,15 +31,11 @@ def add_post():
         new_post = Post(title=title, content=content)
         db.session.add(new_post)
         db.session.commit()
-        return redirect(url_for('view_post'))
-    return render_template('addpost.html')
+        return redirect(url_for('view_all'))
+    
+    return render_template('add.html')
 
-@app.route('/view_post')
-def view_post():
-    posts = Post.query.all()
-    return render_template('viewpost.html', posts=posts)
-
-@app.route('/view/<int:id>')
+@app.route('/view/<int:id>', methods=['GET', 'POST'])
 def view(id):
     post = Post.query.get_or_404(id)
     return render_template('view.html', post=post)
@@ -46,15 +47,8 @@ def edit(id):
         post.title = request.form.get('title')
         post.content = request.form.get('content')
         db.session.commit()
-        return redirect(url_for('view_post'))
+        return redirect(url_for('view_all'))
     return render_template('edit.html', post=post)
-
-@app.route('/delete/<int:id>', methods=['POST'])
-def delete(id):
-    post = Post.query.get_or_404(id)
-    db.session.delete(post)
-    db.session.commit()
-    return redirect(url_for('view_post'))
 
 if __name__ == '__main__':
     with app.app_context():
