@@ -1,3 +1,10 @@
+* {
+  text-decoration: none;
+}
+
+nav a {
+  color: #fff;
+}
 body {
   background-color: #191d47cc;
 }
