@@ -1,7 +1,0 @@
-{% extends 'base.html' %} {% block title %}View{% endblock %} {% block content %}
-<h1>Post</h1>
-{% if post %}
-<h2>{{ post.title }}</h2>
-<h2>{{ post.content }}</h2>
-<small>Posted on: {{ post.timestamp|localtime }}</small>
-{% endif %} {% endblock %}

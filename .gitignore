@@ -1,2 +1,6 @@
 posts.db
 instance
+venv/
+node_modules/
+__pycache__/
+*.pyc
