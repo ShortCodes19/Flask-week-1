@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, url_for
+from flask import Flask, render_template, redirect, request, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -22,10 +22,15 @@ def add():
     if request.method == 'POST':
         title = request.form.get('title')
         content = request.form.get('content')
+        
+        if not title or not content:
+            flash('Title and content are required!', 'error')
+            return redirect(url_for('add'))
 
         new_post = Post(title=title, content=content)
         db.session.add(new_post)
         db.session.commit()
+     
         return redirect(url_for('view_all'))
     return render_template('add.html')
 
@@ -34,5 +39,31 @@ def view_all():
     posts = Post.query.all()
     return render_template('view_all.html', posts=posts)
 
+@app.route('/view/<int:id>')
+def view(id):
+    post = Post.query.get_or_404(id)
+    return render_template('view.html', post=post)
+
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit(id):
+    post = Post.query.get_or_404(id)
+    if request.method == 'POST':
+        post.title = request.form.get('title')
+        post.content = request.form.get('content')
+        db.session.commit()
+
+        return redirect(url_for('view_all'))
+    return render_template('edit.html', post=post)
+
+@app.route('/delete/<int:id>', methods=['POST'])
+def delete(id):
+    post = Post.query.get_or_404(id)
+    db.session.delete(post)
+    db.session.commit()
+    return redirect(url_for('view_all'))
+
+
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)

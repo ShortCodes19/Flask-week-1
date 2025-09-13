@@ -3,25 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./static/css/styles.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
     <title>{% block title %}Home{% endblock %}</title>
   </head>
   <body>
     <nav class="flex justify-between bg-gray-400 px-10 py-5 drop-shadow-lg">
-      <h1 class="text-3xl font-bold text-white">POSTY</h1>
+      <a href="{{ url_for('view_all') }}" class="text-3xl font-bold text-white">POSTY</a>
       <div class="mx-2">
         <a
           href="{{ url_for('add') }}"
-          class="mr-2 text-black hover:text-white bg-gray-700 p-3 rounded-lg transition-all duration-300 ease-in-out hover:bg-gray-900 font-semibold">
+          class="mr-2 text-gray-400 hover:text-white bg-gray-700 p-3 rounded-lg transition-all duration-300 ease-in-out hover:bg-gray-900 font-semibold">
           Add Post
         </a>
         <a
           href="{{ url_for('view_all') }}"
-          class="mr-2 text-black hover:text-white bg-gray-700 p-3 rounded-lg transition-all duration-300 ease-in-out hover:bg-gray-900 font-semibold">
+          class="mr-2 text-gray-400 hover:text-white bg-gray-700 p-3 rounded-lg transition-all duration-300 ease-in-out hover:bg-gray-900 font-semibold">
           View Post
         </a>
       </div>
     </nav>
-    {% block content %}{% endblock %}
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for
+    category, message in messages %}
+    <div class="bg-red-400 text-white p-3 text-center font-semibold">{{ message }}</div>
+    {% endfor %} {% endif %} {% endwith %} {% block content %}{% endblock %}
   </body>
 </html>
