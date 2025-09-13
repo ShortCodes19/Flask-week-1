@@ -4,10 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./static/css/styles.css" />
-    <title>Document</title>
+    <title>{% block title %}Home{% endblock %}</title>
   </head>
   <body>
-    <h1 class="bg-red-500">Hello World</h1>
-    <p class="bg-orange-400 p-3 border-2">Parag</p>
+    <nav class="flex justify-between bg-gray-400 px-10 py-5 drop-shadow-lg">
+      <h1 class="text-3xl font-bold text-white">POSTY</h1>
+      <div class="mx-2">
+        <a
+          href="{{ url_for('add') }}"
+          class="mr-2 text-black hover:text-white bg-gray-700 p-3 rounded-lg transition-all duration-300 ease-in-out hover:bg-gray-900 font-semibold">
+          Add Post
+        </a>
+        <a
+          href="{{ url_for('view_all') }}"
+          class="mr-2 text-black hover:text-white bg-gray-700 p-3 rounded-lg transition-all duration-300 ease-in-out hover:bg-gray-900 font-semibold">
+          View Post
+        </a>
+      </div>
+    </nav>
+    {% block content %}{% endblock %}
   </body>
 </html>
