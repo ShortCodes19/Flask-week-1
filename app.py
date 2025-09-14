@@ -12,7 +12,8 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now)
+    created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.now, nullable=True)
 
 
 @app.route("/")
@@ -52,6 +53,18 @@ def view_all():
                 post.relative_time = f"{hours} {'hour' if hours == 1 else 'hours'} ago"
         else:
             post.relative_time = post.created_at.strftime('%B %d, %Y, %I:%M %p')
+        post.updated_relative = ""
+        if post.updated_at:
+            diff = datetime.now() - post.updated_at
+            if diff.days == 0:
+                minutes = diff.seconds // 60
+                if minutes < 60:
+                    post.updated_relative = f"{minutes} {'min' if minutes == 1 else 'mins'} ago"
+                else:
+                    hours = minutes // 60
+                    post.updated_relative = f"{hours} {'hour' if hours == 1 else 'hours'} ago"
+            else:
+                post.relative_time = post.created_at.strftime('%B %d, %Y, %I:%M %p')
     return render_template('view_all.html', posts=posts)
 
 
@@ -69,6 +82,18 @@ def view(id):
             post.relative_time = f"{hours} {'hour' if hours == 1 else 'hours'} ago"
     else:
         post.relative_time = post.created_at.strftime('%B %d, %Y, %I:%M %p')
+        post.updated_relative = ""
+        if post.updated_at:
+            diff = datetime.now() - post.updated_at
+            if diff.days == 0:
+                minutes = diff.seconds // 60
+                if minutes < 60:
+                    post.updated_relative = f"{minutes} {'min' if minutes == 1 else 'mins'} ago"
+                else:
+                    hours = minutes // 60
+                    post.updated_relative = f"{hours} {'hour' if hours == 1 else 'hours'} ago"
+            else:
+                post.relative_time = post.created_at.strftime('%B %d, %Y, %I:%M %p')
     return render_template('view.html', post=post)
 
 
