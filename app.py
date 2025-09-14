@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, request, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import or_
 from datetime import datetime
 
 app = Flask(__name__)
@@ -23,7 +24,7 @@ def hello_world():
 @app.route('/add', methods=['GET', 'POST'])
 def add():
     if request.method == 'POST':
-        title = request.form.get('title')
+        title = request.form.get('title').strip()
         content = request.form.get('content')
         
         if not title or not content:
@@ -40,7 +41,13 @@ def add():
 
 @app.route('/view_all')
 def view_all():
-    posts = Post.query.order_by(Post.created_at.desc()).all()
+    search = request.args.get('search', '')
+    if search:
+        posts = Post.query.filter(or_(Post.title.contains(search), Post.content.contains(search))).order_by(Post.created_at.desc()).all()
+    else:
+        posts = Post.query.order_by(Post.created_at.desc()).all()
+    
+    
     # Add relative_time to each post
     for post in posts:
         diff = datetime.now() - post.created_at
@@ -65,7 +72,7 @@ def view_all():
                     post.updated_relative = f"{hours} {'hour' if hours == 1 else 'hours'} ago"
             else:
                 post.relative_time = post.created_at.strftime('%B %d, %Y, %I:%M %p')
-    return render_template('view_all.html', posts=posts)
+    return render_template('view_all.html', posts=posts, search=search)
 
 
 @app.route('/view/<int:id>')
