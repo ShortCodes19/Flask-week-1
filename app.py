@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, request, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///post.db'
@@ -11,6 +12,7 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now)
 
 
 @app.route("/")
@@ -31,18 +33,44 @@ def add():
         db.session.add(new_post)
         db.session.commit()
      
+        print(new_post.created_at)
         return redirect(url_for('view_all'))
     return render_template('add.html')
 
 @app.route('/view_all')
 def view_all():
-    posts = Post.query.all()
+    posts = Post.query.order_by(Post.created_at.desc()).all()
+    # Add relative_time to each post
+    for post in posts:
+        diff = datetime.now() - post.created_at
+        if diff.days == 0:
+            minutes = diff.seconds // 60
+            if minutes < 60:
+                post.relative_time = f"{minutes} {'min' if minutes == 1 else 'mins'} ago"
+            else:
+                hours = minutes // 60
+                post.relative_time = f"{hours} {'hour' if hours == 1 else 'hours'} ago"
+        else:
+            post.relative_time = post.created_at.strftime('%B %d, %Y, %I:%M %p')
     return render_template('view_all.html', posts=posts)
+
 
 @app.route('/view/<int:id>')
 def view(id):
     post = Post.query.get_or_404(id)
+    # Format timestamp for detail page
+    diff = datetime.now() - post.created_at
+    if diff.days == 0:
+        minutes = diff.seconds // 60
+        if minutes < 60:
+            post.relative_time = f"{minutes} {'min' if minutes == 1 else 'mins'} ago"
+        else:
+            hours = minutes // 60
+            post.relative_time = f"{hours} {'hour' if hours == 1 else 'hours'} ago"
+    else:
+        post.relative_time = post.created_at.strftime('%B %d, %Y, %I:%M %p')
     return render_template('view.html', post=post)
+
 
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit(id):
