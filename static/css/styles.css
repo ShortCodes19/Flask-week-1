@@ -190,6 +190,9 @@
   .static {
     position: static;
   }
+  .col-span-full {
+    grid-column: 1 / -1;
+  }
   .container {
     width: 100%;
     @media (width >= 40rem) {
@@ -276,6 +279,9 @@
   }
   .justify-between {
     justify-content: space-between;
+  }
+  .gap-5 {
+    gap: calc(var(--spacing) * 5);
   }
   .gap-6 {
     gap: calc(var(--spacing) * 6);
