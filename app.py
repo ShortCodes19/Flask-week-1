@@ -2,11 +2,12 @@ from flask import Flask, render_template, redirect, request, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_
 from datetime import datetime
+from form import AddForm
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///post.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'secret'
+app.config['SECRET_KEY'] = '25e4b01195839c73626e9d7d9ed60c68'
 db = SQLAlchemy(app)
 
 class Post(db.Model):
@@ -23,21 +24,15 @@ def hello_world():
 
 @app.route('/add', methods=['GET', 'POST'])
 def add():
-    if request.method == 'POST':
-        title = request.form.get('title').strip()
-        content = request.form.get('content')
-        
-        if not title or not content:
-            flash('Title and content are required!', 'error')
-            return redirect(url_for('add'))
-
-        new_post = Post(title=title, content=content)
+    form = AddForm()
+    if form.validate_on_submit():
+        new_post = Post(title=form.title.data, content=form.content.data)
         db.session.add(new_post)
         db.session.commit()
-     
+        
         print(new_post.created_at)
         return redirect(url_for('view_all'))
-    return render_template('add.html')
+    return render_template('add.html', form=form)
 
 @app.route('/view_all')
 def view_all():
