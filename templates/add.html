@@ -14,15 +14,14 @@
     <form action="{{ url_for('add') }}" method="post">
       {{ form.hidden_tag() }}
       <div class="mb-4">
-        {{ form.title.label(class="block text-gray-300 text-sm font-bold mb-2") }} {{
-        form.title(class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2
-        focus:ring-blue-500", placeholder="Title") }} {% for error in form.title.errors %}
+        {{ form.title(class="w-full p-2 border border-gray-300 rounded focus:outline-none
+        focus:ring-2 focus:ring-blue-500", placeholder="Title") }} {% for error in form.title.errors
+        %}
         <span class="text-red-500 text-xs">{{ error }}</span>
         {% endfor %}
       </div>
       <div class="mb-4">
-        {{ form.content.label(class="block text-gray-300 text-sm font-bold mb-2") }} {{
-        form.content(class="w-full p-2 border border-gray-300 rounded focus:outline-none
+        {{ form.content(class="w-full p-2 border border-gray-300 rounded focus:outline-none
         focus:ring-2 focus:ring-blue-500", rows="10", placeholder="Write your content") }} {% for
         error in form.content.errors %}
         <span class="text-red-500 text-xs">{{ error }}</span>
